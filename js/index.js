@@ -97,7 +97,7 @@ const displayTimer = () => {
         document.querySelector('.time').innerHTML = timer++
     }, 1000)
 }
-displayTimer()
+// displayTimer()
 
 const restSecondarySide = (a, b, c) => {
     sideActive[a] = null
