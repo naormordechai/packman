@@ -10,8 +10,8 @@ var x, y, z;
 const packman = {
     left: 0,
     top: 0,
-    bottom: 300,
-    right: 300,
+    bottom: 380,
+    right: 450,
     width: 20,
     height: 20,
     isSuper: false
@@ -21,38 +21,80 @@ const enemies = [
     {
         top: 75,
         left: 75,
-        bottom: 225,
-        right: 225
+        bottom: 205,
+        right: 385
     },
     {
         top: 100,
         left: 100,
-        bottom: 200,
-        right: 200
+        bottom: 280,
+        right: 350
     },
     {
         top: 125,
         left: 125,
-        bottom: 175,
-        right: 175
+        bottom: 255,
+        right: 325
     },
     {
         top: 150,
         left: 150,
-        bottom: 150,
-        right: 150
+        bottom: 230,
+        right: 300
     },
     {
         top: 175,
         left: 175,
-        bottom: 125,
-        right: 125
+        bottom: 285,
+        right: 285
     },
     {
         top: 100,
         left: 100,
-        bottom: 200,
-        right: 200
+        bottom: 280,
+        right: 350
+    },
+    {
+        top: 100,
+        left: 300,
+        bottom: 280,
+        right: 150
+    },
+    {
+        top: 100,
+        left: 400,
+        bottom: 280,
+        right: 50
+    },
+    {
+        top: 330,
+        left: 400,
+        bottom: 50,
+        right: 50
+    },
+    {
+        top: 360,
+        left: 400,
+        bottom: 20,
+        right: 50
+    },
+    {
+        top: 250,
+        left: 430,
+        bottom: 130,
+        right: 20
+    },
+    {
+        top: 350,
+        left: 20,
+        bottom: 30,
+        right: 430
+    },
+    {
+        top: 190,
+        left: 225,
+        bottom: 190,
+        right: 225
     },
 
 ]
@@ -60,13 +102,13 @@ const enemies = [
 const enemyPosition = {
     top: 100,
     left: 100,
-    bottom: 200,
-    right: 200
+    bottom: 280,
+    right: 350
 }
 
 const boardSize = {
-    width: 300,
-    height: 300
+    width: 450,
+    height: 380
 };
 
 const sideActive = {
@@ -91,8 +133,28 @@ const clearIntervalsOfSides = (a, b, c) => {
     clearInterval(sideActive[c])
 };
 
+const createFoodInit = () => {
+    let [top, left] = [20, 20];
+    let [bottom, right] = [boardSize.height - top, boardSize.width - left];
+    for (let i = 0; i < 180; i++) {
+        const board = document.querySelector('.board');
+        board.innerHTML += '<div class="food" style="top:' + top + 'px; left:' + left + 'px; bottom:' + bottom + 'px; right:' + right + 'px;"></div>'
+        if (top < 330) {
+            top += 30
+            bottom -= 30
+        } else {
+            top = 20
+            left += 30
+            right -= 30
+            bottom = boardSize.height - top
+        }
+    }
+}
+
+createFoodInit()
+
 const displayTimer = () => {
-    let timer = 1
+    let timer = 1   
     setInterval(() => {
         document.querySelector('.time').innerHTML = timer++
     }, 1000)
@@ -151,7 +213,7 @@ function movePackman(e) {
 
 const movePackmanRight = e => {
     if (gameISOn) {
-        if (packman.left <= 300) {
+        if (packman.left <= 425) {
             packman.left = packman.left + 5;
             packman.right = packman.right - 5
             document.querySelector('.packman').style.left = packman.left + 'px';
@@ -161,7 +223,7 @@ const movePackmanRight = e => {
 
 const movePackmanLeft = e => {
     if (gameISOn) {
-        if (packman.left >= 0) {
+        if (packman.left >= packman.width) {
             packman.left = packman.left - 5;
             packman.right = packman.right + 5;
             document.querySelector('.packman').style.left = packman.left + 'px';
@@ -170,7 +232,7 @@ const movePackmanLeft = e => {
 }
 const movePackmanUp = e => {
     if (gameISOn) {
-        if (packman.top >= 0) {
+        if (packman.top >= packman.height) {
             packman.top = packman.top - 5;
             packman.bottom = packman.bottom + 5
             document.querySelector('.packman').style.top = packman.top + 'px';
@@ -179,7 +241,7 @@ const movePackmanUp = e => {
 }
 const movePackmanDown = e => {
     if (gameISOn) {
-        if (packman.top <= 300) {
+        if (packman.top <= 355) {
             packman.top = packman.top + 5;
             packman.bottom = packman.bottom - 5
             document.querySelector('.packman').style.top = packman.top + 'px';
@@ -198,16 +260,16 @@ const createFood = (className) => {
     }
 }
 
-const createRegularFood = () => {
-    createFood('food')
-}
+// const createRegularFood = () => {
+//     createFood('food')
+// }
 
 const createSuperFood = () => {
     createFood('super-food')
 
 }
 
-setInterval(createRegularFood, 2000)
+// setInterval(createRegularFood, 2000)
 setInterval(createSuperFood, 5000)
 
 const recognizePackmanEating = (className) => {
@@ -287,14 +349,14 @@ const moveEnemy = () => {
             if (enemies[i].top <= 20) {
                 enemies[i].top = 20
             }
-            if (enemies[i].top >= 280) {
-                enemies[i].top = 280
+            if (enemies[i].top >= boardSize.height - 50) {
+                enemies[i].top = boardSize.height - 50
             }
             if (enemies[i].left <= 20) {
                 enemies[i].left = 20
             }
-            if (enemies[i].left >= 280) {
-                enemies[i].left = 280;
+            if (enemies[i].left >= boardSize.width - 50) {
+                enemies[i].left = boardSize.width - 50;
             }
             const addedNum = Math.random() > 0.5 ? 10 : -10;
             if (Math.random() > 0.5) {
