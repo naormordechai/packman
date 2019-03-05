@@ -1,15 +1,15 @@
 'use strict'
 
 let gameISOn = true;
-let cancelRecognizeCollision;
-let cancelSuperPackman;
 let time = 5000;
 let timeOfSuperPackman;
 let timeForSpeed;
 let prevKeyPress;
-let speedTimePackman = 30;
+let timeMoveEnemy = 130;
+let speedPackman = 50;
+let cancelCheckWinner;
 
-var x, y, z;
+var cancelTimeNotSuper, cancelTimeYesSuper;
 
 const packman = {
     left: 0,
@@ -58,56 +58,6 @@ let enemies = [
         bottom: 285,
         right: 285
     },
-    // {
-    //     id: Math.floor(Math.random() * 100000) + '',
-    //     top: 100,
-    //     left: 100,
-    //     bottom: 280,
-    //     right: 350
-    // },
-    // {
-    //     top: 100,
-    //     left: 300,
-    //     bottom: 280,
-    //     right: 150
-    // },
-    // {
-    //     top: 100,
-    //     left: 400,
-    //     bottom: 280,
-    //     right: 50
-    // },
-    // {
-    //     top: 330,
-    //     left: 400,
-    //     bottom: 50,
-    //     right: 50
-    // },
-    // {
-    //     top: 360,
-    //     left: 400,
-    //     bottom: 20,
-    //     right: 50
-    // },
-    // {
-    //     top: 250,
-    //     left: 430,
-    //     bottom: 130,
-    //     right: 20
-    // },
-    // {
-    //     top: 350,
-    //     left: 20,
-    //     bottom: 30,
-    //     right: 430
-    // },
-    // {
-    //     top: 190,
-    //     left: 225,
-    //     bottom: 190,
-    //     right: 225
-    // },
-
 ]
 
 const enemyPosition = {
@@ -145,10 +95,10 @@ const clearIntervalsOfSides = (a, b, c) => {
 };
 
 const createFoodInit = () => {
-    let [top, left] = [20, 20];
+    let [top, left] = [30, 20];
     let [bottom, right] = [boardSize.height - top, boardSize.width - left];
-    for (let i = 0; i < 180; i++) {
-        const board = document.querySelector('.board');
+    const board = document.querySelector('.board');
+    for (let i = 0; i < 2; i++) { // 179 length
         board.innerHTML += '<div class="food" style="top:' + top + 'px; left:' + left + 'px; bottom:' + bottom + 'px; right:' + right + 'px;"></div>'
         if (top < 330) {
             top += 30
@@ -193,7 +143,7 @@ function movePackman(e) {
             if (!sideActive.right) {
                 clearIntervalsOfSides('left', 'up', 'down')
                 restSecondarySide('left', 'up', 'down')
-                sideActive.right = setInterval(movePackmanRight, speedTimePackman)
+                sideActive.right = setInterval(movePackmanRight, speedPackman)
             } else return
             break;
         case 37:
@@ -201,7 +151,7 @@ function movePackman(e) {
             if (!sideActive.left) {
                 clearIntervalsOfSides('right', 'up', 'down')
                 restSecondarySide('right', 'up', 'down')
-                sideActive.left = setInterval(movePackmanLeft, speedTimePackman)
+                sideActive.left = setInterval(movePackmanLeft, speedPackman)
             } else return
             break;
         case 38:
@@ -209,7 +159,7 @@ function movePackman(e) {
             if (!sideActive.up) {
                 clearIntervalsOfSides('right', 'left', 'down')
                 restSecondarySide('right', 'left', 'down')
-                sideActive.up = setInterval(movePackmanUp, speedTimePackman);
+                sideActive.up = setInterval(movePackmanUp, speedPackman);
             } else return
             break;
         case 40:
@@ -217,7 +167,7 @@ function movePackman(e) {
             if (!sideActive.down) {
                 clearIntervalsOfSides('right', 'up', 'left')
                 restSecondarySide('right', 'up', 'left')
-                sideActive.down = setInterval(movePackmanDown, speedTimePackman)
+                sideActive.down = setInterval(movePackmanDown, speedPackman)
             } else return
             break;
     }
@@ -227,8 +177,6 @@ function movePackman(e) {
 // Movement of packman
 
 const movePackmanRight = e => {
-    console.log(speedTimePackman);
-
     if (gameISOn) {
         if (packman.left <= 425) {
             packman.left = packman.left + 5;
@@ -278,7 +226,6 @@ const createElementInBoard = (className) => {
 }
 
 const createSuperFood = () => createElementInBoard('super-food');
-
 const createSpeed = () => createElementInBoard('speed');
 
 
@@ -297,7 +244,7 @@ const recognizePackmanEating = (className) => {
                     if (className === 'super-food' && !packman.isSuper) {
                         // food.remove()
                         time = time === 0 ? 5000 : time
-                        x = setInterval(() => {
+                        cancelTimeNotSuper = setInterval(() => {
                             if (time) {
                                 time -= 1000
                             }
@@ -317,10 +264,10 @@ const recognizePackmanEating = (className) => {
                         }, 5000)
 
                     } else if (className === 'super-food' && packman.isSuper) {
-                        if (x) clearInterval(x)
-                        if (y) clearInterval(y)
+                        if (cancelTimeNotSuper) clearInterval(cancelTimeNotSuper)
+                        if (cancelTimeYesSuper) clearInterval(cancelTimeYesSuper)
                         time = 5000
-                        y = setInterval(() => {
+                        cancelTimeYesSuper = setInterval(() => {
                             if (time) {
                                 time -= 1000
                             }
@@ -330,6 +277,7 @@ const recognizePackmanEating = (className) => {
                             packman.isSuper = false
                             document.querySelectorAll('.enemy')
                                 .forEach(enemy => {
+                                    git
                                     enemy.style.opacity = '1'
 
                                 })
@@ -337,41 +285,42 @@ const recognizePackmanEating = (className) => {
                     }
                     if (className === 'speed' && !packman.isSpeeder) {
                         packman.isSpeeder = true
-                        speedTimePackman = 10;
+                        speedPackman = 30;
                         switch (prevKeyPress) {
                             case 39:
                                 clearInterval(sideActive.right)
                                 sideActive.right = null
-                                sideActive.right = setInterval(movePackmanRight, speedTimePackman)
+                                sideActive.right = setInterval(movePackmanRight, speedPackman)
                                 break;
                             case 37:
                                 clearInterval(sideActive.left)
                                 sideActive.left = null;
-                                sideActive.left = setInterval(movePackmanLeft, speedTimePackman)
+                                sideActive.left = setInterval(movePackmanLeft, speedPackman)
                                 break;
                             case 38:
                                 clearInterval(sideActive.up)
                                 sideActive.up = null;
-                                sideActive.up = setInterval(movePackmanUp, speedTimePackman)
+                                sideActive.up = setInterval(movePackmanUp, speedPackman)
                                 break;
                             case 40:
                                 clearInterval(sideActive.down)
                                 sideActive.down = null;
-                                sideActive.down = setInterval(movePackmanDown, speedTimePackman)
+                                sideActive.down = setInterval(movePackmanDown, speedPackman)
                                 break;
                         }
                         timeForSpeed = setTimeout(() => {
-                            speedTimePackman = 30;
+                            speedPackman = 50;
                             packman.isSpeeder = false
                         }, 3000)
                     } else if (className === 'speed' && packman.isSpeeder) {
                         clearTimeout(timeForSpeed);
                         timeForSpeed = setTimeout(() => {
-                            speedTimePackman = 30;
+                            speedPackman = 50;
                             packman.isSpeeder = false
                         }, 3000)
                     }
                     food.remove()
+                    document.querySelector('.score').innerHTML = parseInt(document.querySelector('.score').innerHTML) + 1
                 }
             })
     }
@@ -404,8 +353,6 @@ createEnemy()
 
 const moveEnemy = () => {
     if (gameISOn && enemies.length) {
-        console.log(enemies);
-
         for (let i = 0; i < enemies.length; i++) {
             if (enemies[i].top <= 20) {
                 enemies[i].top = 20
@@ -442,7 +389,7 @@ const moveEnemy = () => {
 
     }
 }
-setInterval(moveEnemy, 100)
+setInterval(moveEnemy, timeMoveEnemy)
 
 function recognizeCollision() {
     if (gameISOn && enemies.length) {
@@ -458,7 +405,7 @@ function recognizeCollision() {
                             const id = enemy.className.substr(11);
                             enemies = enemies.filter(enemy => enemy.id !== id);
                             enemy.remove()
-
+                            document.querySelector('.score').innerHTML = parseInt(document.querySelector('.score').innerHTML) + 5
                         } else {
                             gameISOn = false
                         }
@@ -483,8 +430,8 @@ const removeElementFromBoard = (className) => {
     }
 }
 
-setInterval(() => removeElementFromBoard('super-food'), 10000)
-setInterval(() => removeElementFromBoard('speed'), 15000)
+setInterval(() => removeElementFromBoard('super-food'), 11500)
+setInterval(() => removeElementFromBoard('speed'), 17000)
 
 
 
@@ -505,8 +452,8 @@ function addAnimationForEnemy(enemy) {
             } else {
                 enemy.style.animation = null
                 enemy.style.opacity = '1'
-                clearInterval(y)
-                clearInterval(x)
+                clearInterval(cancelTimeYesSuper)
+                clearInterval(cancelTimeNotSuper)
             }
         })
 }
@@ -514,7 +461,7 @@ function addAnimationForEnemy(enemy) {
 setInterval(addAnimationForEnemy, 100);
 
 
-const createRandomEnemies = () => {
+const createRandomEnemy = () => {
     const newEnemies = [
         {
             id: Math.floor(Math.random() * 1000000) + '',
@@ -523,16 +470,21 @@ const createRandomEnemies = () => {
             left: 275,
             right: 275
         },
-        {
-            id: Math.floor(Math.random() * 1000000) + '',
-            top: 240,
-            bottom: 240,
-            left: 275,
-            right: 275
-        },
+
     ];
     enemies = enemies.concat(newEnemies)
     createEnemy(newEnemies)
 };
 
-setInterval(createRandomEnemies, 5000)
+setInterval(createRandomEnemy, 6000)
+
+const checkIfWinner = () => {
+    const foods = document.querySelectorAll('.food');;
+    if (!foods.length) {
+        gameISOn = false
+        document.querySelector('.well-done').innerText = 'Well Done! :)'
+        clearInterval(cancelCheckWinner)
+    }
+}
+
+cancelCheckWinner = setInterval(checkIfWinner, 30);
