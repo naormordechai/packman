@@ -98,7 +98,7 @@ const createFoodInit = () => {
     let [top, left] = [30, 20];
     let [bottom, right] = [boardSize.height - top, boardSize.width - left];
     const board = document.querySelector('.board');
-    for (let i = 0; i < 2; i++) { // 179 length
+    for (let i = 0; i < 179; i++) { 
         board.innerHTML += '<div class="food" style="top:' + top + 'px; left:' + left + 'px; bottom:' + bottom + 'px; right:' + right + 'px;"></div>'
         if (top < 330) {
             top += 30
